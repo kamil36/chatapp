@@ -1,5 +1,6 @@
-
+import 'package:app_chat/models/ui_helper.dart';
 import 'package:app_chat/models/user_model.dart';
+import 'package:app_chat/pages/home_page.dart';
 import 'package:app_chat/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,41 +14,47 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
-   TextEditingController emailController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  void checkValues(){
+  void checkValues() {
     String email = emailController.text.trim();
-        String password = passwordController.text.trim();
-        if(email==""||password=="" ){
-          print("Please fill all the fields!");
-        }
-        else{
-          logIn(email , password);
-        }
+    String password = passwordController.text.trim();
+    if (email == "" || password == "") {
+      UIHelper.showAlertDialog(
+          context, "Incomplete Data", "Please fill all the fields");
+    } else {
+      logIn(email, password);
+    }
   }
-      void logIn(String email, String password)async{
-        UserCredential? credential;
-        try{
-          credential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-        } on FirebaseAuthException catch(ex){
-          print(ex.message.toString());
-        }
-        if(credential!= null){
-          String uid = credential.user!.uid;
-          DocumentSnapshot userData = await FirebaseFirestore.instance.collection("users").doc(uid).get();
-          UserModel userModel = UserModel.fromMap(userData.data() as Map<String, dynamic>);
 
-          print("Log In Successful!");
-        }
+  void logIn(String email, String password) async {
+    UserCredential? credential;
+    UIHelper.showLoadingDialog(context, "Logging In...");
 
-      }
+    try {
+      credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+    } on FirebaseAuthException catch (ex) {
+      Navigator.pop(context);
+      UIHelper.showAlertDialog(
+          context, "An error occured!", ex.message.toString());
+    }
+    if (credential != null) {
+      String uid = credential.user!.uid;
+      DocumentSnapshot userData =
+          await FirebaseFirestore.instance.collection("users").doc(uid).get();
+      UserModel userModel =
+          UserModel.fromMap(userData.data() as Map<String, dynamic>);
 
+      print("Log In Successful!");
+      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+        return HomePage(userModel: userModel, firebaseUser: credential!.user!);
+      }));
+    }
+  }
 
-
-
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,14 +76,14 @@ class _LoginPageState extends State<LoginPage> {
                   height: 30,
                 ),
                 TextField(
-                  controller: emailController,
+                    controller: emailController,
                     decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30))),
-                  hintText: "Enter a Email",
-                  labelText: "Email Address",
-                )),
+                      prefixIcon: Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30))),
+                      hintText: "Enter a Email",
+                      labelText: "Email Address",
+                    )),
                 SizedBox(
                   height: 20,
                 ),
