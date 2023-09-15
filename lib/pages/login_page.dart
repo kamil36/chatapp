@@ -5,6 +5,8 @@ import 'package:app_chat/pages/signup_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_dynamic_icon/flutter_dynamic_icon.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -146,4 +148,17 @@ class _LoginPageState extends State<LoginPage> {
       )),
     );
   }
+}
+
+setBadgeNum(int count, BuildContext context) async {
+  try {
+    await FlutterDynamicIcon.setApplicationIconBadgeNumber(count);
+  } on PlatformException {
+    print('Exception: Platform not supported');
+  } catch (e) {
+    print(e);
+  }
+  // To get currently badge number that was set.
+  int badgeNumber = await FlutterDynamicIcon.getApplicationIconBadgeNumber();
+  // Quick alert box for acknowledgement
 }

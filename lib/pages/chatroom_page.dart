@@ -108,16 +108,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   decoration: BoxDecoration(
                                     color: (currentMessage.Sender ==
                                             widget.userModel.uid)
-                                        ? Colors.grey
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
+                                        ? Colors.green
+                                        : Colors.blueAccent,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: Text(
                                     currentMessage.text.toString(),
                                     style: TextStyle(
                                       color: Colors.white,
+                                      fontSize: 16,
                                     ),
                                   )),
                             ],
